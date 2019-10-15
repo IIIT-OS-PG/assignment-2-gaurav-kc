@@ -1,3 +1,4 @@
+// Client side C/C++ program to demonstrate Socket programming
 #include <stdio.h>
 #include <cmath>
 #include <sys/socket.h>
@@ -177,7 +178,7 @@ void send_joining_request(string gid,string ip,string port)
     char* status = new char[20];
     char msgtype = rec_buffer[0];
     char *saveptr1;
-    strcpy(status,strtok_r(NULL,":",&saveptr1));
+    strcpy(status,strtok_r(rec_buffer,":",&saveptr1));
     if(status == "success")
     {
         cout<<"Request received by group owner "<<endl;
@@ -200,6 +201,7 @@ void group_owner_ack(string status,string gid, string ip,string port)
         }
         cout<<endl;
         cout<<"Sending request "<<endl;
+        cout<<"gid here is "<<gid<<endl;
         send_joining_request(gid,ip,port);
     }else{
         cout<<status;
@@ -611,6 +613,8 @@ void create_account(string id,string password)
     {
         strcpy(status,strtok_r(NULL,":",&saveptr1));
         strcpy(cid,strtok_r(NULL,":",&saveptr1));
+        cout<<"cid i got is "<<cid<<endl;
+        self_cid = cid;
         acc_creation_ack(status,cid);
     }else{
         cout<<"Wrong message type received "<<endl;
@@ -896,7 +900,7 @@ void accept_request(string groupid,string cid)
             }
 
             serv_addr1.sin_family = AF_INET;
-            serv_addr1.sin_port = htons( getport(tempreq.port) );
+            serv_addr1.sin_port = htons( TPORT );
 
             if(inet_pton(AF_INET, "127.0.0.1", &serv_addr1.sin_addr)<=0)
             {
@@ -917,7 +921,7 @@ void accept_request(string groupid,string cid)
             char* status = new char[20];
             char msgtype = rec_buffer1[0];
             char *saveptr1;
-            strcpy(status,strtok_r(NULL,":",&saveptr1));
+            strcpy(status,strtok_r(rec_buffer1,":",&saveptr1));
             if(status == "success")
             {
                 cout<<"Tracker updated successfully "<<endl;
@@ -1107,6 +1111,7 @@ void upload_file(string path,string groupid)
     filetohash[path]=sha;
     hashtofile[sha]=path;
     string message = "m:success:"+self_cid+":"+groupid+":"+filename+":"+sha+":"+to_string(getSize(path))+":";
+    cout<<"message is "<<message<<endl;
     char buffer[message.size()+1];
     strcpy(buffer,message.c_str());
     int sock = 0, valread;
@@ -1518,7 +1523,7 @@ void* listenerThread(void* arg)
 int main(int argc, char const *argv[])
 {
 	int portno=0;
-    string self_port = argv[1];
+    self_port = argv[1];
     CPORT = getport(self_port);
     KEEP_LISTENING = true;
     pthread_t listenerThreadid;

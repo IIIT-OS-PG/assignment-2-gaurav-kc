@@ -1,3 +1,4 @@
+// Server side C/C++ program to demonstrate Socket programming
 #include <unistd.h>
 #include <stdio.h>
 #include <cmath>
@@ -226,20 +227,30 @@ void send_clients_for_file(string status,string cid,string gid,string filename,i
 void store_file_upload(string status,string cid,string gid,string filename,string sha1,string filesize,int socket)
 {
 	string reply="n:success:";
+	cout<<"1";
 	hashvalue[filename] = make_pair(sha1,make_pair(gid,filesize));
+	cout<<"2";
 	list<string> temp;
+	cout<<"3";
 	temp.push_back(cid);
+	cout<<"4";
 	client_list[sha1] = temp;
+	cout<<"5";
 	auto it = files_in_group.find(gid);
+	cout<<"6";
 	if(it != files_in_group.end())
 	{
 		(it->second).push_back(filename);
+		cout<<"7";
 	}else{
         cout<<"Group not found"<<endl;
 	}
 	char buffer[reply.size()+1];
+	cout<<"1";
 	strcpy(buffer,reply.c_str());
+	cout<<"1";
 	cout<<buffer<<endl;
+	cout<<"1";
 	send(socket,buffer,reply.size()+1,0);
 }
 
@@ -250,6 +261,8 @@ void create_group(string status,string cid,string gid,string ip,string port,int 
     list<string> temp;
     temp.push_back(cid);
     group_membership[gid]=temp;
+    list<string> temp1;
+    files_in_group[gid]=temp1;
     char buffer[reply.size()+1];
 	strcpy(buffer,reply.c_str());
 	cout<<buffer<<endl;
@@ -404,6 +417,7 @@ void* parseInput(void *vargp)
     		strcpy(gid,strtok_r(NULL,":",&saveptr1));
     		strcpy(cid,strtok_r(NULL,":",&saveptr1));
     		group_member_addition(status,gid,cid,socket);
+    		break;
     	}
     	default :
     	{
@@ -746,7 +760,7 @@ void insertDummyargs()
 
 int main(int argc, char const *argv[])
 {
-    insertDummyargs();
+    //insertDummyargs();
     KEEP_LISTENING = true;
     pthread_t listenerThreadid;
     pthread_create(&listenerThreadid, NULL, listenerThread,NULL);
